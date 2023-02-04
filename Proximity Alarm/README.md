@@ -19,7 +19,7 @@ The alarm will activate the Green led :green_circle: if we are 30 centimeters aw
  
  ## Demo
 
-| MarketApp |
+| Demo |
 | ------------- |
 | <video src="https://user-images.githubusercontent.com/43689290/216744842-3b3ff700-85d2-444c-aef6-d1f34f371233.mov" width=180 height=392> |
 
