@@ -6,5 +6,10 @@ Source code: [here](https://github.com/juniorsaraviao/ESP32-Course/tree/master/P
 
 ## Homework 2
 
-Objective 1: Timer with Ultrasonic sensor
-Objective 2: Timer with Flame sensor
+- Objective 1: Timer with Ultrasonic sensor
+
+https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%202#objective-1-timer-with-ultrasonic-sensor
+
+- Objective 2: Timer with Flame sensor
+
+https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%202#objective-2-timer-with-flame-sensor
