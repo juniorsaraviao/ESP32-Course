@@ -2,11 +2,19 @@
 #include <WiFi.h>
 #include <Firebase_ESP_Client.h>
 #include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <DHT.h>
 
 // Provide the token generation process info.
 #include "addons/TokenHelper.h"
 // Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
+
+
+#define DHTPIN 4          // Digital pin connected to the DHT sensor
+#define DHTTYPE DHT11     // DHT 11
+
+DHT dht(DHTPIN, DHTTYPE);
 
 // Insert your network credentials
 #define WIFI_SSID "<YOUR_SSID>"
@@ -91,6 +99,9 @@ void setup(){
   //initBME();
   initWiFi();
 
+  // Init DHT
+  dht.begin();
+
   // Assign the api key (required)
   config.api_key = API_KEY;
 
@@ -147,8 +158,15 @@ void loop(){
     ///////COMENTAN ESTA SECCION SI DESEAN UTILIZAR EL BME////////////////
       if(contador>20){contador = 1.0;}
       contador=contador+1;
-    temperature = contador*0.1;
-    humidity = contador*0.2;
+    temperature = dht.readTemperature();
+    humidity = dht.readHumidity();
+
+    Serial.print("Temperature: ");
+    Serial.print(temperature);
+    Serial.print(" °C\t");
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.println(" %");
     pressure = contador*0.3;
 
 
