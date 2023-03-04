@@ -4,11 +4,20 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
+#include <ArduinoJson.h>
+#include "SensorData.h"
 
 // Provide the token generation process info.
 #include "addons/TokenHelper.h"
 // Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
+
+// Ultrasonic sensor
+#define echo 14
+#define trigger 12
+#define ultrasonicDivisor 58
+uint8_t distance = 0;
+unsigned long t = 0;
 
 
 #define DHTPIN 4          // Digital pin connected to the DHT sensor
@@ -40,28 +49,10 @@ String uid;
 
 // Variables to save database paths
 String databasePath;
-String tempPath;
-String humPath;
-String presPath;
-
-// BME280 sensor
-//Adafruit_BME280 bme; // I2C
-float temperature;
-float humidity;
-float pressure;
-float contador =1.0;
 
 // Timer variables (send new readings every three minutes)
 unsigned long sendDataPrevMillis = 0;
 unsigned long timerDelay = 5000;
-
-// Initialize BME280
-/*void initBME(){
-  if (!bme.begin(0x76)) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    while (1);
-  }
-}*/
 
 // Initialize WiFi
 void initWiFi() {
@@ -76,20 +67,13 @@ void initWiFi() {
 }
 
 // Write float values to the database
-void sendFloat(String path, float value){
-  if (Firebase.RTDB.setFloat(&fbdo, path.c_str(), value)){
-    Serial.print("Writing value: ");
-    Serial.print (value);
-    Serial.print(" on the following path: ");
-    Serial.println(path);
-    Serial.println("PASSED");
-    Serial.println("PATH: " + fbdo.dataPath());
-    Serial.println("TYPE: " + fbdo.dataType());
-  }
-  else {
-    Serial.println("FAILED");
-    Serial.println("REASON: " + fbdo.errorReason());
-  }
+void sendJson(FirebaseJson firebaseJson){
+  if (Firebase.RTDB.setJSON(&fbdo, static_cast<const char*>(databasePath.c_str()), &firebaseJson)) {
+      Serial.println("Upload success");
+    } else {
+      Serial.println("Upload failed");
+      Serial.println(fbdo.errorReason());
+    }
 }
 
 void setup(){
@@ -101,6 +85,10 @@ void setup(){
 
   // Init DHT
   dht.begin();
+
+  // Init ultrasonic
+  pinMode(echo, INPUT);
+  pinMode(trigger, OUTPUT);
 
   // Assign the api key (required)
   config.api_key = API_KEY;
@@ -137,42 +125,48 @@ void setup(){
 
   // Update database path
   databasePath = "/UsersData/" + uid;
-
-  // Update database path for sensor readings
-  tempPath = databasePath + "/temperature"; // --> UsersData/<user_uid>/temperature
-  humPath = databasePath + "/humidity"; // --> UsersData/<user_uid>/humidity
-  presPath = databasePath + "/pressure"; // --> UsersData/<user_uid>/pressure
 }
 
 void loop(){
   // Send new readings to database
   if (Firebase.ready() && (millis() - sendDataPrevMillis > timerDelay || sendDataPrevMillis == 0)){
     sendDataPrevMillis = millis();
-    
 
-    // Get latest sensor readings
-   /* temperature = bme.readTemperature();
-    humidity = bme.readHumidity();
-    pressure = bme.readPressure()/100.0F;*/
+    SensorData sensorData;
+    sensorData.Temperature = dht.readTemperature();
+    sensorData.Humidity = dht.readHumidity();
 
-    ///////COMENTAN ESTA SECCION SI DESEAN UTILIZAR EL BME////////////////
-      if(contador>20){contador = 1.0;}
-      contador=contador+1;
-    temperature = dht.readTemperature();
-    humidity = dht.readHumidity();
+    // Distance
+    digitalWrite(trigger, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trigger, LOW);
+
+    t = pulseIn(echo, HIGH);
+    sensorData.Distance = t/ultrasonicDivisor;
+    Serial.print("The distance is: ");
+    Serial.println(sensorData.Distance);
+
+    // Create a JSON object and serialize the SensorData instance
+    StaticJsonDocument<200> doc;
+    doc["humidity"] = sensorData.Humidity;
+    doc["temperature"] = sensorData.Temperature;
+    doc["distance"] = sensorData.Distance;
+
+    String jsonString;
+    serializeJson(doc, jsonString);
 
     Serial.print("Temperature: ");
-    Serial.print(temperature);
+    Serial.print(sensorData.Temperature);
     Serial.print(" °C\t");
     Serial.print("Humidity: ");
-    Serial.print(humidity);
+    Serial.print(sensorData.Humidity);
     Serial.println(" %");
-    pressure = contador*0.3;
 
+    // Create a FirebaseJson object and copy the JSON object into it
+    FirebaseJson firebaseJson;
+    firebaseJson.setJsonData(jsonString.c_str());
 
-    // Send readings to database:
-    sendFloat(tempPath, temperature);
-    sendFloat(humPath, humidity);
-    sendFloat(presPath, pressure);
+    // Upload the JSON object to Firebase
+    sendJson(firebaseJson);
   }
 }
