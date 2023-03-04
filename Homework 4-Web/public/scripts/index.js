@@ -6,7 +6,7 @@ const authBarElement = document.querySelector("#authentication-bar");
 // Elements for sensor readings
 const tempElement = document.getElementById("temp");
 const humElement = document.getElementById("hum");
-const presElement = document.getElementById("pres");
+const distElement = document.getElementById("dist");
 
 // MANAGE LOGIN/LOGOUT UI
 const setupUI = (user) => {
@@ -25,7 +25,7 @@ const setupUI = (user) => {
     // Database paths (with user UID)
     var dbPathTemp = 'UsersData/' + uid.toString() + '/temperature';
     var dbPathHum = 'UsersData/' + uid.toString() + '/humidity';
-    var dbPathPres = 'UsersData/' + uid.toString() + '/pressure';
+    var dbPathPres = 'UsersData/' + uid.toString() + '/distance';
 
     // Database references
     var dbRefTemp = firebase.database().ref().child(dbPathTemp);
@@ -42,7 +42,7 @@ const setupUI = (user) => {
     });
 
     dbRefPres.on('value', snap => {
-      presElement.innerText = snap.val().toFixed(2);
+      distElement.innerText = snap.val().toFixed(2);
     });
 
   // if user is logged out
