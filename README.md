@@ -13,3 +13,10 @@ https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%202#objectiv
 - Objective 2: Timer with Flame sensor
 
 https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%202#objective-2-timer-with-flame-sensor
+
+
+## Homework 4
+
+Firebase web server
+- ESP32 code: https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%204
+- Firebase code: https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%204-Web
