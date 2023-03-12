@@ -14,6 +14,10 @@ https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%202#objectiv
 
 https://github.com/juniorsaraviao/ESP32-Course/tree/master/Homework%202#objective-2-timer-with-flame-sensor
 
+## Homework 3
+- Objective 1: The speed control of a motor will be done by reading the potentiometer, this reading and control must be done every 100 ms by means of a timer.
+
+- Objective 2: The direction of rotation of the motor will be controlled by the keyboard, when an "L" is sent, the rotation must be counterclockwise, when a "R" is sent, the rotation will be clockwise.
 
 ## Homework 4
 
